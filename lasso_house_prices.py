@@ -8,6 +8,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import os
+print("RUNNING SCRIPT:", os.path.abspath(__file__))
 
 from sklearn.model_selection import train_test_split
 from sklearn.compose import ColumnTransformer
@@ -18,15 +20,12 @@ from sklearn.linear_model import LinearRegression, RidgeCV, LassoCV, Lasso
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error
 
-
 RANDOM_STATE = 42
 np.random.seed(RANDOM_STATE)
-
-
 def rmse(y_true, y_pred):
-    """Version-proof RMSE (avoid mean_squared_error(..., squared=False))."""
+    import numpy as np
+    from sklearn.metrics import mean_squared_error
     return float(np.sqrt(mean_squared_error(y_true, y_pred)))
-
 
 def resolve_data_dir(cli_dir: str | None) -> Path:
     """Pick where train.csv lives: CLI -> Kaggle path -> Downloads -> CWD."""
