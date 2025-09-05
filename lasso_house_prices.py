@@ -30,6 +30,8 @@ def get_feature_names(preproc, numeric_cols, categorical_cols):
 
 def main():
     df = pd.read_csv(DATA_DIR / 'train.csv')
+    print("Using DATA_DIR =", DATA_DIR)
+    assert (DATA_DIR / "train.csv").exists(), "train.csv not found in DATA_DIR"
     target_col = 'SalePrice'
     y = np.log1p(df[target_col].copy())
     X = df.drop(columns=[target_col, 'Id'])
