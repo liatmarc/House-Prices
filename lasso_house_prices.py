@@ -2,7 +2,6 @@
 # LASSO on Kaggle House Prices — complete script (sklearn 1.7+ friendly)
 
 import argparse
-import os
 from pathlib import Path
 
 import numpy as np
@@ -10,6 +9,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 print("RUNNING SCRIPT:", os.path.abspath(__file__))
+
+from pathlib import Path
+RESULTS_DIR = Path("results")
+RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
 from sklearn.model_selection import train_test_split
 from sklearn.compose import ColumnTransformer
@@ -61,7 +64,15 @@ def get_feature_names(preproc: ColumnTransformer, numeric_cols, categorical_cols
         ohe = preproc.named_transformers_["cat"]["ohe"]
         cat_names = ohe.get_feature_names_out(categorical_cols)
         return np.array(list(numeric_cols) + list(cat_names))
-
+        
+def savefig(name):
+    import matplotlib.pyplot as plt
+    plt.tight_layout()
+    plt.savefig(RESULTS_DIR / name, dpi=120)
+# then call:
+savefig("sparsity_path.png")
+savefig("performance_path.png")
+savefig("residuals.png")
 
 def main():
     # --- CLI args ---
@@ -154,7 +165,7 @@ def main():
     plt.ylabel("# non-zero coefficients")
     plt.title("LASSO sparsity path")
     plt.tight_layout()
-    plt.savefig("sparsity_path.png")
+    plt.savefig(RESULTS_DIR / "sparsity_path.png")
 
     plt.figure()
     plt.plot(alphas_for_path, rmses, marker="o")
@@ -163,7 +174,7 @@ def main():
     plt.ylabel("RMSE (log-price)")
     plt.title("Performance vs regularization")
     plt.tight_layout()
-    plt.savefig("performance_path.png")
+    plt.savefig(RESULTS_DIR / "performance_path.png")
 
     # --- RANDOM FOREST COMPARISON ---
     rf = Pipeline([
@@ -173,6 +184,15 @@ def main():
     rf.fit(X_train, y_train)
     rf_rmse = rmse(y_test, rf.predict(X_test))
     print(f"\nRandomForest RMSE (log-price): {rf_rmse:.4f}")
+
+    # after computing results dict and rf_rmse / top features
+    (summary := RESULTS_DIR / "summary.md").write_text(
+    "## Summary\n"
+    + "\n".join(f"- {k}: {v:.4f}" for k, v in results.items())
+    + f"\n- RandomForest RMSE (log): {rf_rmse:.4f}\n",
+    encoding="utf-8",
+    )  
+
 
     rf_pre = rf.named_steps["preprocess"]
     rf_names = rf_pre.get_feature_names_out()
@@ -193,8 +213,13 @@ def main():
     plt.ylabel("Residual (actual - pred)")
     plt.title("Residuals — should look like noise")
     plt.tight_layout()
+    plt.savefig(RESULTS_DIR / "residuals.png")
     plt.savefig("residuals.png")
-
+    # then call:
+    savefig("sparsity_path.png")
+    savefig("performance_path.png")
+    savefig("residuals.png")
+    
     # RMSE by price bucket
     q = pd.qcut(y_test, q=3, labels=["Low", "Mid", "High"])
     rmse_by_bucket = pd.DataFrame({
