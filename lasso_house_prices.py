@@ -13,6 +13,7 @@ print("RUNNING SCRIPT:", os.path.abspath(__file__))
 from pathlib import Path
 RESULTS_DIR = Path("results")
 RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+print("Saving plots to:", RESULTS_DIR)
 
 from sklearn.model_selection import train_test_split
 from sklearn.compose import ColumnTransformer
