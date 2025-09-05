@@ -1,5 +1,7 @@
 # LASSO on Kaggle House Prices — Minimal Script
 # Run on Kaggle or locally. See README.md for instructions.
+import os
+print("SCRIPT PATH =", os.path.abspath(__file__))
 
 import numpy as np
 import pandas as pd
