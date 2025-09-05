@@ -19,7 +19,7 @@ RANDOM_STATE = 42
 np.random.seed(RANDOM_STATE)
 
 DEFAULT_KAGGLE = Path('/kaggle/input/house-prices-advanced-regression-techniques')
-DATA_DIR = DEFAULT_KAGGLE if DEFAULT_KAGGLE.exists() else Path('Downloads')
+DATA_DIR = Path(r"C:\Users\trani\Downloads")
 def get_feature_names(preproc, numeric_cols, categorical_cols):
     try:
         return preproc.get_feature_names_out()
