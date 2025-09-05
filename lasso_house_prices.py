@@ -1,19 +1,16 @@
 # lasso_house_prices.py
 # LASSO on Kaggle House Prices — complete script (sklearn 1.7+ friendly)
 
+# lasso_house_prices.py
+# LASSO on Kaggle House Prices — sklearn 1.7+ friendly, results saved to /results
+
 import argparse
+import os
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import os
-print("RUNNING SCRIPT:", os.path.abspath(__file__))
-
-from pathlib import Path
-RESULTS_DIR = Path("results")
-RESULTS_DIR.mkdir(parents=True, exist_ok=True)
-print("Saving plots to:", RESULTS_DIR)
 
 from sklearn.model_selection import train_test_split
 from sklearn.compose import ColumnTransformer
@@ -24,11 +21,18 @@ from sklearn.linear_model import LinearRegression, RidgeCV, LassoCV, Lasso
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error
 
+
 RANDOM_STATE = 42
 np.random.seed(RANDOM_STATE)
+
+# Results dir (next to this script)
+RESULTS_DIR = Path(__file__).resolve().parent / "results"
+RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+print("RUNNING SCRIPT:", os.path.abspath(__file__))
+print("Saving plots to:", RESULTS_DIR)
+
 def rmse(y_true, y_pred):
-    import numpy as np
-    from sklearn.metrics import mean_squared_error
+    """Version-proof RMSE"""
     return float(np.sqrt(mean_squared_error(y_true, y_pred)))
 
 def resolve_data_dir(cli_dir: str | None) -> Path:
@@ -38,42 +42,27 @@ def resolve_data_dir(cli_dir: str | None) -> Path:
         p = Path(cli_dir)
         if (p / "train.csv").exists():
             return p
-
     if (DEFAULT_KAGGLE / "train.csv").exists():
         return DEFAULT_KAGGLE
-
     downloads = Path.home() / "Downloads"
     if (downloads / "train.csv").exists():
         return downloads
-
     cwd = Path.cwd()
     if (cwd / "train.csv").exists():
         return cwd
-
     raise FileNotFoundError(
-        "Could not find train.csv. Pass --data-dir, or place train.csv in your "
-        "Downloads or the current folder."
+        "Could not find train.csv. Pass --data-dir, or place train.csv in "
+        "Kaggle input, your Downloads, or the current folder."
     )
-
 
 def get_feature_names(preproc: ColumnTransformer, numeric_cols, categorical_cols):
     """Get feature names after ColumnTransformer."""
     try:
         return preproc.get_feature_names_out()
     except Exception:
-        # Fallback (shouldn't be needed on recent sklearn)
         ohe = preproc.named_transformers_["cat"]["ohe"]
         cat_names = ohe.get_feature_names_out(categorical_cols)
         return np.array(list(numeric_cols) + list(cat_names))
-        
-def savefig(name):
-    import matplotlib.pyplot as plt
-    plt.tight_layout()
-    plt.savefig(RESULTS_DIR / name, dpi=120)
-# then call:
-savefig("sparsity_path.png")
-savefig("performance_path.png")
-savefig("residuals.png")
 
 def main():
     # --- CLI args ---
@@ -186,15 +175,6 @@ def main():
     rf_rmse = rmse(y_test, rf.predict(X_test))
     print(f"\nRandomForest RMSE (log-price): {rf_rmse:.4f}")
 
-    # after computing results dict and rf_rmse / top features
-    (summary := RESULTS_DIR / "summary.md").write_text(
-    "## Summary\n"
-    + "\n".join(f"- {k}: {v:.4f}" for k, v in results.items())
-    + f"\n- RandomForest RMSE (log): {rf_rmse:.4f}\n",
-    encoding="utf-8",
-    )  
-
-
     rf_pre = rf.named_steps["preprocess"]
     rf_names = rf_pre.get_feature_names_out()
     rf_imps = rf.named_steps["rf"].feature_importances_
@@ -202,11 +182,10 @@ def main():
     print("\nRandom Forest top features:")
     print(rf_top.to_string(index=False))
 
-    # --- DIAGNOSTICS BY PRICE BUCKET ---
+    # --- DIAGNOSTICS: Residuals & buckets ---
     lasso_preds = models["LassoCV"].predict(X_test)
     resid = y_test - lasso_preds
 
-    # Save a residual plot
     plt.figure()
     plt.scatter(lasso_preds, resid, alpha=0.5)
     plt.axhline(0, linestyle="--")
@@ -215,13 +194,7 @@ def main():
     plt.title("Residuals — should look like noise")
     plt.tight_layout()
     plt.savefig(RESULTS_DIR / "residuals.png")
-    plt.savefig("residuals.png")
-    # then call:
-    savefig("sparsity_path.png")
-    savefig("performance_path.png")
-    savefig("residuals.png")
-    
-    # RMSE by price bucket
+
     q = pd.qcut(y_test, q=3, labels=["Low", "Mid", "High"])
     rmse_by_bucket = pd.DataFrame({
         "bucket": ["Low", "Mid", "High"],
@@ -233,7 +206,6 @@ def main():
     })
     print("\nRMSE by price bucket (log-scale):")
     print(rmse_by_bucket.to_string(index=False))
-
 
 if __name__ == "__main__":
     main()
