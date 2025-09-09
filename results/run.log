@@ -1,0 +1,27 @@
+RUNNING SCRIPT: C:\Users\trani\House-Prices\lasso_house_prices.py
+SCRIPT PATH   = C:\Users\trani\House-Prices\lasso_house_prices.py
+Using DATA_DIR = C:\Users\trani\Downloads
+Rows: 1460, Columns: 81
+Numeric features: 36, Categorical features: 43
+OLS RMSE (log-price): 0.1273
+RidgeCV RMSE (log-price): 0.1353
+LassoCV RMSE (log-price): 0.1232
+Best alpha (LASSO CV): 0.000543
+
+Top LASSO features:
+                   feature      coef
+     cat__RoofMatl_ClyTile -1.365112
+      cat__Condition2_PosN -0.362949
+ cat__Neighborhood_StoneBr  0.112481
+            num__GrLivArea  0.111807
+ cat__Neighborhood_Crawfor  0.109277
+  cat__Exterior1st_BrkFace  0.093335
+     cat__MSZoning_C (all) -0.077979
+          num__OverallQual  0.074812
+       cat__Functional_Typ  0.062194
+ cat__Neighborhood_NridgHt  0.061262
+      cat__Functional_Maj2 -0.056147
+cat__SaleCondition_Abnorml -0.054944
+          cat__MSZoning_RM -0.052644
+          cat__BsmtQual_Ex  0.051810
+            num__YearBuilt  0.048839
