@@ -5,7 +5,7 @@
 - **OLS**: 0.1273
 - **RidgeCV**: 0.1353
 - **LassoCV**: 0.1232
-- **RandomForest**: 0.1398
+- **RandomForest**: 0.1397
 - **LASSO best alpha**: 0.000543
 - **Elastic Net best**: RMSE=0.1256, l1_ratio=0.8, alpha=0.000719686
 
