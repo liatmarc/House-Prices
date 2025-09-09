@@ -38,3 +38,9 @@ This bundle contains:
 - We model **log-transformed** prices (`np.log1p`) for stability.
 - Use a proper **train/test split** (already included).
 - You can extend this with Elastic Net, target encoding, or segmented models.
+
+## Results
+![LASSO Sparsity Path](results/sparsity_path.png)
+![Performance vs Regularization](results/performance_path.png)
+![Residuals](results/residuals.png)
+
