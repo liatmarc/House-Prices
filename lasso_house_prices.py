@@ -30,32 +30,6 @@ RESULTS_DIR = Path(__file__).resolve().parent / "results"
 RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 print("RUNNING SCRIPT:", os.path.abspath(__file__))
 print("Saving plots to:", RESULTS_DIR)
-def savefig(fig, name):
-    fig.tight_layout()
-    fig.savefig(RESULTS_DIR / name, dpi=120)
-    plt.close(fig)
-
-# Sparsity
-fig1, ax1 = plt.subplots()
-ax1.plot(alphas_for_path, nonzeros, marker="o")
-ax1.set_xscale("log"); ax1.set_xlabel("alpha"); ax1.set_ylabel("# non-zero")
-ax1.set_title("LASSO sparsity path")
-savefig(fig1, "sparsity_path.png")
-
-# Performance
-fig2, ax2 = plt.subplots()
-ax2.plot(alphas_for_path, rmses, marker="o")
-ax2.set_xscale("log"); ax2.set_xlabel("alpha"); ax2.set_ylabel("RMSE (log-price)")
-ax2.set_title("Performance vs regularization")
-savefig(fig2, "performance_path.png")
-
-# Residuals
-fig3, ax3 = plt.subplots()
-ax3.scatter(lasso_preds, resid, alpha=0.5)
-ax3.axhline(0, linestyle="--")
-ax3.set_xlabel("Predicted log-price"); ax3.set_ylabel("Residual")
-ax3.set_title("Residuals — should look like noise")
-savefig(fig3, "residuals.png")
 
 def rmse(y_true, y_pred):
     """Version-proof RMSE"""
@@ -232,6 +206,33 @@ def main():
     })
     print("\nRMSE by price bucket (log-scale):")
     print(rmse_by_bucket.to_string(index=False))
+    
+def savefig(fig, name):
+    fig.tight_layout()
+    fig.savefig(RESULTS_DIR / name, dpi=120)
+    plt.close(fig)
+
+# Sparsity
+fig1, ax1 = plt.subplots()
+ax1.plot(alphas_for_path, nonzeros, marker="o")
+ax1.set_xscale("log"); ax1.set_xlabel("alpha"); ax1.set_ylabel("# non-zero")
+ax1.set_title("LASSO sparsity path")
+savefig(fig1, "sparsity_path.png")
+
+# Performance
+fig2, ax2 = plt.subplots()
+ax2.plot(alphas_for_path, rmses, marker="o")
+ax2.set_xscale("log"); ax2.set_xlabel("alpha"); ax2.set_ylabel("RMSE (log-price)")
+ax2.set_title("Performance vs regularization")
+savefig(fig2, "performance_path.png")
+
+# Residuals
+fig3, ax3 = plt.subplots()
+ax3.scatter(lasso_preds, resid, alpha=0.5)
+ax3.axhline(0, linestyle="--")
+ax3.set_xlabel("Predicted log-price"); ax3.set_ylabel("Residual")
+ax3.set_title("Residuals — should look like noise")
+savefig(fig3, "residuals.png")
 
 if __name__ == "__main__":
     main()
